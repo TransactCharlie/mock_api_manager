@@ -1,0 +1,26 @@
+version: '3'
+services:
+  redis:
+    image: redis:alpine
+    expose: ["6379"]
+    volumes:
+    - ./redis/data:/data
+  
+  mockbin:
+    image: brianlow/mockbin
+    ports: ["8080:8080"]
+    depends_on:
+      - redis
+    entrypoint:
+    - "bin/mockbin"
+    - "-r"
+    - "redis://redis:6379"
+    - "-p"
+    - "8080"
+  
+  linkerd:
+    image: buoyantio/linkerd
+    ports: ["1080:1080", "9990:9990"]
+    volumes:
+    - ./linkerd/:/etc/linkerd
+    command: ["/etc/linkerd/config.yml"]
